@@ -4,6 +4,7 @@ import Menu from './components/Menu';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import { Obtemenu } from './fitbase/Obtemenu';
+import { useNavigate } from 'react-router-dom';
 
 const Hom = () => {
   const [cart, setCart] = useState([]);
@@ -88,6 +89,11 @@ useEffect(() => {
 
 
 
+  const navigate = useNavigate();
+
+  const irADashboard = () => {
+    navigate("/pgos"); // Redirige a la ruta /dashboard
+  };
 
 
 
@@ -95,6 +101,7 @@ useEffect(() => {
   return (
     <div className="app">
     <Navbar activeView={activeView} setActiveView={setActiveView} />
+<button onClick={irADashboard}>Ir a Checkout</button>
 
 
       {activeView === "menu" && <Menu onAdd={addToCart} Menuac={Menuac} />}
@@ -102,6 +109,11 @@ useEffect(() => {
         <Cart cart={cart} onAdd={addToCart} onRemove={removeFromCart} onClear={clearCart} activeView={activeView} setActiveView={setActiveView}   />
       )}
       {activeView === "checkout" && <Checkout cart={cart} />}
+
+
+
+
+
     </div>
   );
 };
