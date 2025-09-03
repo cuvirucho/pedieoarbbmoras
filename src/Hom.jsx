@@ -4,13 +4,18 @@ import Menu from './components/Menu';
 import Cart from './components/Cart';
 import Checkout from './components/Checkout';
 import { Obtemenu } from './fitbase/Obtemenu';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import Pedidos from './components/Pedidos';
 
 const Hom = () => {
   const [cart, setCart] = useState([]);
   const [activeView, setActiveView] = useState("menu"); // nuevo estado
 const [Menuac, setMenuac] = useState([]);
-  useEffect(() => {
+  
+
+
+
+useEffect(() => {
     const savedCart = localStorage.getItem("cart");
     if (savedCart) setCart(JSON.parse(savedCart));
   }, []);
@@ -98,10 +103,22 @@ useEffect(() => {
 
 
 
+
+const location = useLocation();
+  const from = location.state?.from;
+
+
+// 👉 Si "from" existe, actualizar activeView automáticamente
+  useEffect(() => {
+    if (from) {
+      setActiveView(from);
+    }
+  }, [from])
+
+
   return (
     <div className="app">
     <Navbar activeView={activeView} setActiveView={setActiveView} />
-<button onClick={irADashboard}>Ir a Checkout</button>
 
 
       {activeView === "menu" && <Menu onAdd={addToCart} Menuac={Menuac} />}
@@ -110,9 +127,27 @@ useEffect(() => {
       )}
       {activeView === "checkout" && <Checkout cart={cart} />}
 
+      {activeView === "Pedidos" && <Pedidos />}
 
 
 
+
+<div className="foo"   >
+  <p  className='fimar1'  > designed by TRISKEL</p>
+  <p  className='fimar1'    >Obten tu propia web </p>
+
+   <button
+    className='fimar1bt2'
+    onClick={() => {
+      const mensaje = encodeURIComponent("Hola, quiero más información sobre la web");
+      const numero = "593963200325"; // Reemplaza con tu número de WhatsApp (con código de país)
+      window.open(`https://wa.me/${numero}?text=${mensaje}`, "_blank");
+    }}
+  >
+    Más info
+  </button>
+
+</div>
 
     </div>
   );

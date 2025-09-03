@@ -4,7 +4,7 @@ const express = require("express");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
-
+const crypto = require("crypto");
 admin.initializeApp();
 const db = admin.firestore();
 
@@ -19,7 +19,8 @@ const toCents = (n) => Math.round(Number(n) * 100);
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://tu-app.netlify.app" // cambia por tu dominio
+    "http://localhost:5173/pgos",
+    "https://moritasgo.netlify.app" // cambia por tu dominio
   ],
   methods: ["GET","POST","OPTIONS"],
   credentials: true
@@ -39,21 +40,26 @@ app.post("/create-order", async (req, res) => {
     const service = 0;
     const tip = 0;
 
-    cart.forEach(item => {
-      const priceUSD = Number(item.precioVenta) || 0;
-      const qty = Number(item.cantidad) || 1;
-      const totalItemCents = Math.round(priceUSD * qty * 100);
-      const itemTax = Math.round(totalItemCents * 0.18); // 18% impuesto
-      const itemWithoutTax = totalItemCents - itemTax;
+cart.forEach(item => {
+  const priceUSD = Number(item.precioVenta) || 0;
+  const qty = Number(item.cantidad) || 1;
+  
+  const itemWithoutTax = Math.round(priceUSD * qty * 100); // valor en centavos sin impuestos
+  const itemTax = Math.round(itemWithoutTax * 0.18);         // 18% impuesto
 
-      amountWithoutTax += itemWithoutTax;
-      tax += itemTax;
-    });
+  amountWithoutTax += itemWithoutTax;
+  tax += itemTax;
+});
+
 
     const amount = amountWithoutTax + tax + service + tip;
 
     const clientTransactionId = `order_${uuidv4()}`;
-    const docRef = await db.collection("orders").add({
+    const docRef = await db
+    .collection("usuarios")                 // colección principal
+    .doc("principamorasadmi@moritas.com")  // documento específico del usuario
+    .collection("orders")                   // subcolección orders
+    .add({
       clientTransactionId,
       cart,
       form,
@@ -110,17 +116,52 @@ app.post("/confirm", async (req, res) => {
     const data = await resp.json();
 
     // Actualizar Firestore
-    const q = await db.collection("orders").where("clientTransactionId","==",clientTxId).limit(1).get();
+    const q = await db.collection("usuarios")                 // colección principal
+    .doc("principamorasadmi@moritas.com")  // documento específico del usuario
+    .collection("orders") 
+    .where("clientTransactionId","==",clientTxId).limit(1).get();
+    
+    let retiroCode = null;
+        let cart = null;
+
     if (!q.empty) {
       const doc = q.docs[0];
+
+
+  // ✅ Solo si fue aprobado generamos código
+      if (data?.transactionStatus === "Approved") {
+        retiroCode = crypto.randomBytes(4).toString("hex").toUpperCase();
+      }
+      
+      
+      
+      
+      
       await doc.ref.update({
-        status: data?.status || "unknown",
+         ...(retiroCode && { retiroCode }), // 👈 guardamos el código en la orden
+        status: data?.transactionStatus || "unknown",
         payphoneResponse: data,
         confirmedAt: admin.firestore.FieldValue.serverTimestamp()
       });
+   
+   
+    // Ahora leemos el carrito desde el doc
+      const snapshot = await doc.ref.get();
+      const orderData = snapshot.data();
+      cart = orderData?.cart || null;
+   form = orderData?.form || null;
+    metodo = orderData?.metodo || null;
+
     }
 
-    res.json({ ok: true, data });
+
+
+
+
+
+
+    
+    res.json({  data, retiroCode,cart ,form,metodo });
 
   } catch (err) {
     console.error(err);

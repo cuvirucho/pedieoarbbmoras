@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../utilidades/Carousel";
 
@@ -113,7 +113,38 @@ const preguntasOpciones = {
 
 
 
+// 👉 arrastrar con el mouse SOLO en desktop
 
+
+const scrollRef = useRef(null);
+  const isDown = useRef(false);
+  const startX = useRef(0);
+  const scrollLeft = useRef(0)
+
+
+
+const handleMouseDown = (e) => {
+    if (window.innerWidth <= 468) return; // móvil usa scroll normal
+    isDown.current = true;
+    startX.current = e.pageX - scrollRef.current.offsetLeft;
+    scrollLeft.current = scrollRef.current.scrollLeft;
+  };
+
+  const handleMouseLeave = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseUp = () => {
+    isDown.current = false;
+  };
+
+  const handleMouseMove = (e) => {
+    if (!isDown.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX.current) * 1.5; // velocidad
+    scrollRef.current.scrollLeft = scrollLeft.current - walk;
+  };
 
 
   return (
@@ -138,7 +169,15 @@ const preguntasOpciones = {
         ))}
       </div>
 
-      <div className="menuconte">
+        <div
+        className="menuconte"
+        ref={scrollRef}
+        onMouseDown={handleMouseDown}
+        onMouseLeave={handleMouseLeave}
+        onMouseUp={handleMouseUp}
+        onMouseMove={handleMouseMove}
+
+      >
         {platosFiltrados.length > 0 ? (
           <AnimatePresence>
             {platosFiltrados.map((plato, index) => (
@@ -149,43 +188,45 @@ const preguntasOpciones = {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
-                whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
+                whileHover={{
+                  y: -5,
+                  boxShadow: "0 10px 20px rgba(103, 27, 224, 0.87)",
+                }}
+                style={{ minWidth: "250px", flexShrink: 0 }} // 👈 ancho fijo para que se vea en horizontal
               >
-           
-             
-                          <div >
-      <Carousel
-        images={plato.IMAGENES || []}
-        autoPlay
-        interval={8000}
-        showArrows
-        showDots
-        loop
-        aspectRatio="0 / 0" /* o "16 / 9", "1 / 1", etc. */
-      />
-      
-    </div>
-             
-                  <div className="dtospato1"  >
-             
-                <h3  className="nombre-plato" >{plato.nombre}</h3>
-                <p className="precio">{plato.precioVenta.toFixed(2)}</p>
-
+                {/* tu card tal cual */}
+                <div>
+                  <Carousel
+                    images={plato.IMAGENES || []}
+                    autoPlay
+                    interval={8000}
+                    showArrows
+                    showDots
+                    loop
+                    aspectRatio="0 / 0"
+                  />
                 </div>
-                <p className="decrolpt"    >{plato.descripcion}</p>
-      
+
+                <div className="dtospato1">
+                  <h3 className="nombre-plato">{plato.nombre}</h3>
+                  <p className="precio">{plato.precioVenta.toFixed(2)}</p>
+                </div>
+                <p className="decrolpt">{plato.descripcion}</p>
+
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={(e) => openModal(plato, e)}
-                className="menu-cardbutt" 
+                  className="menu-cardbutt"
                 >
                   Seleccionar
                 </motion.button>
               </motion.div>
             ))}
           </AnimatePresence>
-        ) : <p>No se encontraron platos</p>}
+        ) : (
+          <p>No se encontraron platos</p>
+        )}
       </div>
 
       <AnimatePresence>
