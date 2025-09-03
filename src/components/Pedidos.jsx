@@ -9,13 +9,18 @@ const Pedidos = () => {
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [toast, setToast] = useState(null); // <- estado para la notificación
   const userEmail = "principamorasadmi@moritas.com";
-
- useEffect(() => {
+useEffect(() => {
   const storedData = localStorage.getItem("paymentData");
   if (storedData) {
     try {
       const paymentData = JSON.parse(storedData);
-      setPedidos(Array.isArray(paymentData) ? paymentData : [paymentData]);
+      // Filtramos solo Approved o entregado
+      const filteredData = (Array.isArray(paymentData) ? paymentData : [paymentData])
+        .filter(
+          (pedido) =>
+            pedido.entregado || pedido?.payphoneResponse?.transactionStatus === "Approved"
+        );
+      setPedidos(filteredData);
     } catch (error) {
       console.error("Error al parsear datos:", error);
     }
@@ -23,14 +28,16 @@ const Pedidos = () => {
 
   const q = query(collection(db, "usuarios", userEmail, "orders"));
 
-  // Creamos un estado local para guardar pedidos anteriores
   let prevPedidos = [];
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const updatedPedidos = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const updatedPedidos = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      // Filtramos aquí también
+      .filter(
+        (pedido) =>
+          pedido.entregado || pedido?.payphoneResponse?.transactionStatus === "Approved"
+      );
 
     // Detectar cambios de estado a "entregado"
     updatedPedidos.forEach((pedido) => {
@@ -41,17 +48,17 @@ const Pedidos = () => {
       }
     });
 
-    prevPedidos = updatedPedidos; // actualizamos prevPedidos
+    prevPedidos = updatedPedidos;
     setPedidos(updatedPedidos);
     localStorage.setItem("paymentData", JSON.stringify(updatedPedidos));
   });
 
   return () => unsubscribe();
-}, []); // 👈 dependencia vacía para que no se vuelva a ejecutar
+}, []);
 
 
+console.log(pedidos);
 
-console.log(selectedPedido);
 
   return (
     <div className="pedidos-container">
@@ -70,7 +77,7 @@ console.log(selectedPedido);
           {pedidos.map((pedido) => (
             <div key={pedido.id} className="pedido-card">
               <div className="pedido-header">
-                <h2 className="idepdi">ID: {pedido?.payphoneResponse?.transactionId}</h2>
+                <h2 className="idepdi">ID: {pedido?.payphoneResponse?.transactionId||null}</h2>
                 <span
                   className={`estado ${
                     pedido.entregado ? "entregado" : pedido?.payphoneResponse?.transactionStatus === "Approved" ? "aprobado" : "pendiente"

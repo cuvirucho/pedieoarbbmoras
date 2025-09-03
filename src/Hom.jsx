@@ -15,15 +15,6 @@ const [Menuac, setMenuac] = useState([]);
 
 
 
-useEffect(() => {
-    const savedCart = localStorage.getItem("cart");
-    if (savedCart) setCart(JSON.parse(savedCart));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
-  }, [cart]);
-
 
 
 
@@ -125,7 +116,7 @@ const location = useLocation();
       {activeView === "cart" && (
         <Cart cart={cart} onAdd={addToCart} onRemove={removeFromCart} onClear={clearCart} activeView={activeView} setActiveView={setActiveView}   />
       )}
-      {activeView === "checkout" && <Checkout cart={cart} />}
+      {activeView === "checkout" && <Checkout cart={cart} setCart={setCart} />}
 
       {activeView === "Pedidos" && <Pedidos />}
 

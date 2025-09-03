@@ -67,7 +67,7 @@ background-color: #007bff00;
   background-color: blueviolet; /* color destacado */
   font-weight: bold;
   color:floralwhite;
-  transform: scale(1.0.5);
+
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.863);
 }
 
@@ -156,7 +156,7 @@ background-color: #007bff00;
           border-radius: 15px;
           max-width: 18rem;
           min-width: 15rem;
-          min-height: 30rem;
+          min-height: 38.2rem;
          height: 100%;
           width: 100%;
           background-color: #fff;

@@ -29,7 +29,7 @@ const loadPayphoneAssets = () => {
   });
 };
 
-const Checkout = ({ cart = [] }) => {
+const Checkout = ({ cart ,setCart }) => {
   const [metodo, setMetodo] = useState("hospedaje");
   const [form, setForm] = useState({
     fecha: "", hora: "", notas: "", whatsapp: "", nombrecliente: ""
@@ -69,6 +69,29 @@ const [pagogo, setpagogo] = useState(false)
   
   const total = cart.reduce((acc, i) => acc + Number(i.precioVenta) * Number(i.cantidad), 0);
 
+  const [coords, setCoords] = useState(false);
+
+const handleLocationSelect = (location) => {
+  console.log("Ubicación recibida del hijo:", location);
+  setCoords(location); // location es { lat, lng, address }
+
+
+  if (errors.coords) {
+    setErrors(prev => {
+      const newErrors = { ...prev };
+      delete newErrors.coords;
+      return newErrors;
+    });
+  }
+
+};
+
+
+
+const muvopuntogps =() =>{
+setCoords(null);
+  
+}
 
 
 
@@ -94,7 +117,7 @@ const [pagogo, setpagogo] = useState(false)
       const res = await fetch(`${API}/create-order`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart, form, metodo })
+        body: JSON.stringify({ cart, form, metodo ,coords})
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Error creando orden");
@@ -123,6 +146,7 @@ window.ppbInstance = new window.PPaymentButtonBox(cfg).render("pp-button");
       setError(err.message);
     } finally {
       setLoading(false);
+      setCart([]);
     }
   };
 
@@ -134,29 +158,6 @@ window.ppbInstance = new window.PPaymentButtonBox(cfg).render("pp-button");
 
 
 
-  const [coords, setCoords] = useState(null);
-
-const handleLocationSelect = (location) => {
-  console.log("Ubicación recibida del hijo:", location);
-  setCoords(location); // location es { lat, lng, address }
-
-
-  if (errors.coords) {
-    setErrors(prev => {
-      const newErrors = { ...prev };
-      delete newErrors.coords;
-      return newErrors;
-    });
-  }
-
-};
-
-
-
-const muvopuntogps =() =>{
-setCoords(null);
-  
-}
 
 
 const iva = total * 0.18;
@@ -207,8 +208,6 @@ const handleCheckout = () => {
 
 
 
-
-console.log(form);
 
 
 

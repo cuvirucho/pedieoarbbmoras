@@ -32,7 +32,7 @@ app.use(express.json());
  */
 app.post("/create-order", async (req, res) => {
   try {
-    const { cart, form, metodo } = req.body;
+    const { cart, form, metodo,coords } = req.body;
     if (!cart || cart.length === 0) return res.status(400).json({ error: "Carrito vacío" });
 
     let amountWithoutTax = 0;
@@ -64,6 +64,7 @@ cart.forEach(item => {
       cart,
       form,
       metodo,
+      coords,
       amount,
       amountWithoutTax,
       tax,

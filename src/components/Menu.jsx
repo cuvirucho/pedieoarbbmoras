@@ -163,8 +163,7 @@ const navigate = useNavigate();
     <div className="menu">
     
     
-    <button onClick={gopog}>Ir a Pagos</button>
-    
+   
       <input
         type="text"
         placeholder="Buscar plato..."
