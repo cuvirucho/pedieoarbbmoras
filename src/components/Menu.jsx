@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../utilidades/Carousel";
+import { useNavigate } from "react-router-dom";
 
 const Menu = ({ onAdd, Menuac }) => {
   const [busqueda, setBusqueda] = useState("");
@@ -146,9 +147,24 @@ const handleMouseDown = (e) => {
     scrollRef.current.scrollLeft = scrollLeft.current - walk;
   };
 
+///envia ajpmre 
+const navigate = useNavigate();
+
+ const gopog = () => {
+  navigate("/pgos");
+};
+
+
+
+
+
 
   return (
     <div className="menu">
+    
+    
+    <button onClick={gopog}>Ir a Pagos</button>
+    
       <input
         type="text"
         placeholder="Buscar plato..."
