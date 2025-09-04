@@ -112,7 +112,7 @@ const location = useLocation();
     <Navbar activeView={activeView} setActiveView={setActiveView} />
 
 
-      {activeView === "menu" && <Menu onAdd={addToCart} Menuac={Menuac} />}
+      {activeView === "menu" && <Menu onAdd={addToCart} Menuac={Menuac}   setActiveView={setActiveView}      />}
       {activeView === "cart" && (
         <Cart cart={cart} onAdd={addToCart} onRemove={removeFromCart} onClear={clearCart} activeView={activeView} setActiveView={setActiveView}   />
       )}

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../utilidades/Carousel";
 import { useNavigate } from "react-router-dom";
 
-const Menu = ({ onAdd, Menuac }) => {
+const Menu = ({ onAdd, Menuac,setActiveView }) => {
   const [busqueda, setBusqueda] = useState("");
   const [tipoSeleccionado, setTipoSeleccionado] = useState("todos");
   const [modalPlato, setModalPlato] = useState(null);
@@ -55,6 +55,8 @@ const handleAdd = (e) => {
     setToast({ visible: true, top: rect.top, left: rect.left });
 
     setTimeout(() => setToast({ ...toast, visible: false }), 1500); // 1.5s
+  setActiveView("cart")
+  
   }
 };
 
@@ -99,11 +101,11 @@ const preguntasOpciones = {
   },
   "bebida caliente": {
     pregunta: "¿Qué tipo de bebida caliente prefieres?",
-    opciones: ["Café", "Café con leche", "Té"],
+    opciones: ["Cafe", "Café con leche", "Té"],
   },
   "bebida fría": {
     pregunta: "¿Qué bebida fría prefieres?",
-    opciones: ["Jugo", "Smoothie"],
+    opciones: ["Jugo", "batido", "Agua"],
   },
   Pancakes: {
     pregunta: "¿Prefieres Pancakes o Waffles?",
@@ -162,8 +164,16 @@ const navigate = useNavigate();
   return (
     <div className="menu">
     
-    
+    <section>
+
+<img className="imgbibe" src="https://res.cloudinary.com/db8e98ggo/image/upload/v1757026062/hermano_Miguel_y_calle_larga_1_a9yogc.png" alt="" />
+
+
+    </section>
    
+<p  className="titulo"  >Nuesto menu</p>
+
+
       <input
         type="text"
         placeholder="Buscar plato..."
