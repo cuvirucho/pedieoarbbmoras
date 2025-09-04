@@ -18,7 +18,7 @@ const loadPayphoneAssets = () => {
     }
     if (!document.querySelector('script[src*="payphone-payment-box.js"]')) {
       const s = document.createElement("script");
-      s.type = "module";
+      s.type = "text/javascript";
       s.src = "https://cdn.payphonetodoesposible.com/box/v1.1/payphone-payment-box.js";
       s.onload = () => setTimeout(resolve, 200);
       s.onerror = (e) => reject(e);
@@ -140,9 +140,7 @@ window.ppbInstance = new window.PPaymentButtonBox(cfg).render("pp-button");
 
    
     } catch (err) {
-      console.error(err);
-      console.log(await res.json());
-
+   
       setError(err.message);
     } finally {
       setLoading(false);
