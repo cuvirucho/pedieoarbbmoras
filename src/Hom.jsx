@@ -6,6 +6,7 @@ import Checkout from './components/Checkout';
 import { Obtemenu } from './fitbase/Obtemenu';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Pedidos from './components/Pedidos';
+import Tarjetadefidelida from './Tarjetasdeifelida/Tarjetadefidelida';
 
 const Hom = () => {
   const [cart, setCart] = useState([]);
@@ -119,6 +120,7 @@ const location = useLocation();
       {activeView === "checkout" && <Checkout cart={cart} setCart={setCart} />}
 
       {activeView === "Pedidos" && <Pedidos />}
+      {activeView === "Lealtad" && <Tarjetadefidelida />}
 
 
 

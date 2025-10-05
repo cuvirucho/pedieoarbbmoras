@@ -13,17 +13,12 @@ max-width: 100%;
 overflow-y: auto;
 }
 
-  .navbar{
-    background-color: rgba(114, 255, 20, 0);
- gap: 10px;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    height: 15vh;
-   padding: 7px;
-   border-radius: 0 0 10px 10px;
-  }
+/*bar de mvegcaoon*/
+
+
+
+
+  
 
 
 
@@ -31,10 +26,10 @@ overflow-y: auto;
     display: flex;
     border-radius: 10px;
     box-shadow: 1px 1px 5px rgba(99, 11, 199, 0.63);
-    background-color: rgba(179, 255, 0, 0);
-    width: 80%;
+    background-color: rgba(13, 204, 194, 0);
+    width: 100%;
     padding: 8px;
-    max-width: 20rem;
+    max-width: 25rem;
     justify-content: space-around;
   }
 
@@ -46,6 +41,7 @@ overflow-y: auto;
   width: 30%;
   object-fit: scale-down;
   height: 100%;
+  max-width: 10rem;
   border-radius: 10px;
 }
 .navbar button {
@@ -61,6 +57,7 @@ background-color: #007bff00;
 
 .navbar button:hover {
   background-color: #dddddd;
+  color: blueviolet;
 }
 
 .navbar button.active {
@@ -70,6 +67,117 @@ background-color: #007bff00;
 
     box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.863);
 }
+
+
+.navbar {
+ 
+ 
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+      background-color: rgba(114, 255, 20, 0);
+ gap: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: auto;
+padding: 10px;
+   
+
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: rgba(153, 205, 50, 0);
+  width: 100%;
+}
+
+
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-links button {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+
+.nav-links button.active {
+  font-weight: bold;
+
+}
+
+/* Botón hamburguesa (solo visible en móvil) */
+.hamburger {
+  display: none;
+  font-size: clamp(1rem, 2rem ,30px );
+  background: floralwhite;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  background: none;
+}
+
+
+
+
+
+
+/* Fondo oscuro (overlay) */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.55);
+  z-index: 1000;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Estilos para móvil */
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: white;
+    width: 100%;
+    margin-top: 10px;
+    flex-direction: column;
+    align-items: center;
+    display: none;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links button {
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid #eee;
+  }
+}
+
+
+
 
 
 
@@ -1745,3 +1853,490 @@ background-color: rgba(0, 255, 255, 0);
          
         
         }
+
+
+
+
+      /*tarjeta de fidelis */
+
+
+
+      /* estilos.css */
+
+
+
+:root {
+    --color-primario: rgb(255, 255, 255);
+      --color-secundario: #4d02af;
+        --color-tersero: #8a2be2;
+          --color-cuarto: #b229f1;
+            --color-quinto: #ac14e9;
+              --color-sexyo: #850fbb;
+
+              }
+
+
+
+
+@font-face {
+  font-family: 'TanHarmonie';
+  src: url('./assets/fonts/TanHarmoni-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+
+
+
+@font-face {
+  font-family: 'Brown Sugar';
+  src: url('./assets/fonts/brown-sugar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@font-face {
+  font-family: 'High Mount';
+  src: url('./assets/fonts/HighMount-PersonalUse.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/fonts/Montserrat-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.punotstext{
+font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1rem, 1vw, 2.5rem);
+
+  text-align: center;
+  background-color: rgba(238, 238, 12, 0);
+    color: var(--color-quinto);
+    font-weight: 200;
+}
+
+
+.puntosttes{
+  color: var(--color-quinto);
+  font-size: clamp(1rem, 1vw, 2.5rem);
+font-family: 'Montserrat', sans-serif;
+  text-align: center;
+background-color: #8b451300;
+margin-left: 5px;
+
+  
+}
+.CONTEPUTOS{
+  background-color: rgba(188, 143, 143, 0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: -5px;
+}
+
+
+
+
+
+.intrusicnparamas{
+  background-color: rgba(255, 255, 255, 0);
+  font-size: 'Montserrat';
+  font-size: clamp(1rem, 2vw, 2.5rem);
+  font-style: italic;
+  margin-top: 15px;
+color: var(--color-tersero);
+border-radius: 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+.tulotarjeta{
+ font-family: 'Montserrat', sans-serif;
+  font-size: clamp(1.2rem, 2vw, 2.5rem);
+  color: var(--color-sexyo);
+  margin-bottom: 5px;
+  text-align: center;
+font-weight: 400;
+  width: 100%;
+  background-color: #d79a0000;
+
+}
+
+.tulotarjetas{
+  font-family: 'Brown Sugar';
+  font-size: clamp(1.2rem, 2vw, 2.5rem);
+  color: var(--color-secundario);
+  margin-bottom: 5px;
+  text-align: center;
+font-weight: 300;
+  width: 100%;
+}
+
+.bodyp {
+ 
+ 
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  align-items: center;
+}
+
+.contenedorcomo2 {
+background: linear-gradient(45deg, var(--color-primario) 0%, rgba(163, 69, 252, 0.897) 0%, var(--color-tersero) 100%);
+ 
+
+font-size: clamp(1.05rem, 2vw, 2.5rem);
+  padding: 20px;
+  border-radius: 16px;
+  text-align: center;
+  width: 90%;
+  max-width: 500px;
+  color:var(--color-primario);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+.contenedorcomo1 {
+background: linear-gradient(45deg, var(--color-primario) 0%, rgba(163, 69, 252, 0.897) 50%, var(--color-tersero) 100%);
+ 
+
+font-size: clamp(1.05rem, 2vw, 2.5rem);
+  padding: 20px;
+  border-radius: 16px;
+  
+  width: 90%;
+  max-width: 500px;
+  color:var(--color-primario);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+}
+
+
+.contenedor {
+  background: var(--color-primario);
+margin-top: 20px;
+  padding: 0px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+    align-items: center;
+    justify-content: start;
+}
+
+.logodellocal{
+    width: 100%;
+   
+   
+    border-radius: 10px;
+}
+
+
+
+.conteequi{
+  background-color: #21883700;
+}
+
+.contenedor h2,
+.contenedor h3 {
+
+  margin-bottom: 20px;
+}
+
+.imputloycar {
+  display: block;
+  width: 110%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: 1px solid var(--color-secundario);
+  font-size: 16px;
+  box-sizing: border-box;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  border-color: #f8b500;
+  outline: none;
+}
+
+.btncraloy {
+  padding: 12px 20px;
+  background-color: var(--color-tersero);
+  color: var(--color-primario);
+  border:none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.295);
+  transition: background-color 0.3s, transform 0.2s;
+  margin-top: 10px;
+}
+
+button:hover {
+  background-color: #d79a00;
+  transform: scale(1.03);
+  color: #ffffff;
+}
+
+.qr-area {
+
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--color-quinto) ;
+  
+}
+
+
+.qr-area img {
+  margin-top: 10px;
+}
+
+.premios {
+  margin-top: 20px;
+  text-align: center;
+   font-family: 'Montserrat', sans-serif;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    border-radius: 20px;
+    background-color: rgba(255, 0, 0, 0);
+}
+
+.premiosh3 {
+  text-align: center;
+  font-family: 'Brown Sugar';
+  font-size: clamp(1.4rem, 2vw, 2.5rem);
+color: var(--color-secundario);
+}
+
+
+.prmiosul {
+  list-style: none;
+ margin-top: -10px;
+  background-color: #0088f800;
+  display: flex;
+  gap: 10px;
+  padding: 5px;
+  overflow: hidden;
+  overflow-x: auto;
+
+}
+
+.prmiosli {
+   background-color:var(--color-tersero);
+min-width: 150px;
+max-width: 300px;
+  padding: 5px;
+margin-top: 15px;
+  color: var(--color-primario);
+  border-radius: 12px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content:center;
+  
+}
+.prmiosli2 {
+   background-color:var(--color-tersero);
+min-width: 150px;
+max-width: 300px;
+  padding: 5px;
+  color: var(--color-primario);
+  border-radius: 12px;
+  display: flex;
+  text-align: center;
+  align-items: center;
+  justify-content:center;
+  
+}
+
+
+
+.texpremio{
+
+  font-size: clamp(0.8rem, 2vw, 2.5rem);
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 400;
+    text-align: center;
+
+}
+
+
+.itempreitext{
+  background-color: rgba(238, 130, 238, 0);
+  font-size: clamp(0.8rem, 2vw, 2.5rem);
+  width: 70%;
+  font-weight: 400;
+font-style: italic;
+}
+
+
+.titulop{
+    font-size: clamp(1.8rem, 2vw, 2.5rem);
+    color: var(--color-primario);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+
+
+.titulocra{
+    font-size: clamp(1.5rem, 2vw, 2.5rem);
+margin-top: 10px;
+    margin-bottom: 15px;
+    text-align: center;
+  font-family: 'Brown Sugar';
+  color: var(--color-tersero);
+
+
+}
+
+
+.txtocratarjr{
+  background-color: rgba(65, 105, 225, 0);
+  margin-top: -15px;
+    color: var(--color-secundario);
+   font-size: clamp(0.7rem, 2vw, 2.5rem);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.formulario{
+
+  padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  flex-direction: column;
+  border-radius: 20px;
+  margin-bottom: 10px;
+
+}
+
+
+/*carusen de prkoms*/
+
+.carrusel-container {
+  width: 100%;
+height: 200px;
+background: #f8b60000;
+height: auto;
+margin-top: 25px;
+margin-bottom: -50px;
+}
+
+.carrusel-slider {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+ width: auto;
+  height: auto;
+  background-color: rgba(0, 255, 255, 0);
+  margin: 10px ;
+  overflow: hidden;
+overflow-x: auto;
+justify-content: space-between;
+gap: 20px;
+align-items: center;
+ padding: 10px;
+ 
+}
+
+.carrusel-img {
+  width: 100%;
+border-radius: 20px;
+  max-height: 9rem;
+  min-height: 9rem;
+  object-fit: scale-down;
+}
+
+.cmotex {
+ width: 100%;
+  margin-bottom: 4px;
+font-family: 'Montserrat', sans-serif;
+  padding-left: 0rem;     /* espacio antes del texto */
+  text-indent: -1rem;     /* hace que la primera línea retroceda */
+
+
+font-weight: 300; 
+}
+.contenedorcomotexto{
+  background-color: #91312800;
+  display: flex;
+  flex-direction: column;
+justify-content: center;
+align-items: center;
+margin-left: 15px;
+
+}
+
+.txtoinixcal{
+  background-color:b;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: clamp(0.8rem, 2vw, 2.5rem);
+  color: var(--color-tersero);
+  font-weight: 500;
+  padding: 10px;
+  width: 75%;
+  text-align: center;
+  font-style: italic;
+  font-family: 'Montserrat', sans-serif;
+transform: translate(-0%, -0%);
+}

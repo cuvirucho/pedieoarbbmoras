@@ -166,7 +166,7 @@ const navigate = useNavigate();
     
     <section>
 
-<img className="imgbibe" src="https://res.cloudinary.com/db8e98ggo/image/upload/v1757026062/hermano_Miguel_y_calle_larga_1_a9yogc.png" alt="" />
+<img className="imgbibe" src="https://res.cloudinary.com/db8e98ggo/image/upload/v1757369169/hermano_Miguel_y_calle_larga_2_qlsdfs.png" alt="" />
 
 
     </section>
