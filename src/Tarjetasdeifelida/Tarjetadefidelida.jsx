@@ -143,7 +143,7 @@ const guardarCliente = async () => {
    
      <img
             className='logodellocal'
-            src="https://res.cloudinary.com/db8e98ggo/image/upload/v1757369169/hermano_Miguel_y_calle_larga_2_qlsdfs.png"
+            src="https://res.cloudinary.com/db8e98ggo/image/upload/v1761003448/hermano_Miguel_y_calle_larga_3_vdiwxn.png"
             alt="Logo"
           />
 

@@ -16,15 +16,17 @@ const TAX_RATE = parseFloat(process.env.TAX_RATE || "0.12"); // IVA 12%
 const toCents = (n) => Math.round(Number(n) * 100);
 
 // CORS
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://localhost:5173/pgos",
-    "https://moritasgo.netlify.app" // cambia por tu dominio
-  ],
-  methods: ["GET","POST","OPTIONS"],
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:5173/pgos",
+      "https://moritasgo.netlify.app", // cambia por tu dominio
+    ],
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 
 /**
@@ -32,50 +34,52 @@ app.use(express.json());
  */
 app.post("/create-order", async (req, res) => {
   try {
-    const { cart, form, metodo,coords } = req.body;
-    if (!cart || cart.length === 0) return res.status(400).json({ error: "Carrito vacío" });
+    const { cart, form, metodo, coords, delivery } = req.body;
+    if (!cart || cart.length === 0)
+      return res.status(400).json({ error: "Carrito vacío" });
 
     let amountWithoutTax = 0;
     let tax = 0;
-    const service = 0;
+    const service = delivery ? 350 : 0;
     const tip = 0;
 
-cart.forEach(item => {
-  const priceUSD = Number(item.precioVenta) || 0;
-  const qty = Number(item.cantidad) || 1;
-  
-  const itemWithoutTax = Math.round(priceUSD * qty * 100); // valor en centavos sin impuestos
-  const itemTax = Math.round(itemWithoutTax * 0.18);         // 18% impuesto
+    cart.forEach((item) => {
+      const priceUSD = Number(item.precioVenta) || 0;
+      const qty = Number(item.cantidad) || 1;
 
-  amountWithoutTax += itemWithoutTax;
-  tax += itemTax;
-});
+      const itemWithoutTax = Math.round(priceUSD * qty * 100); // valor en centavos sin impuestos
+      const itemTax = Math.round(itemWithoutTax * 0.18); // 18% impuesto
 
+      amountWithoutTax += itemWithoutTax;
+      tax += itemTax;
+    });
+    // 🔑 CLAVE: service va aquí
+    amountWithoutTax += service;
 
-    const amount = amountWithoutTax + tax + service + tip;
+    const amount = amountWithoutTax + tax + tip;
 
     const clientTransactionId = `order_${uuidv4()}`;
     const docRef = await db
-    .collection("usuarios")                 // colección principal
-    .doc("principamorasadmi@moritas.com")  // documento específico del usuario
-    .collection("orders")                   // subcolección orders
-    .add({
-      clientTransactionId,
-      cart,
-      form,
-      metodo,
-      coords,
-      amount,
-      amountWithoutTax,
-      tax,
-      service,
-      tip,
-      status: "pending",
-      createdAt: admin.firestore.FieldValue.serverTimestamp()
-    });
-console.log(amount,"catida");
-console.log(tax,"impuesto");
-console.log(amountWithoutTax,"valor sin impuestos");
+      .collection("usuarios") // colección principal
+      .doc("principamorasadmi@moritas.com") // documento específico del usuario
+      .collection("orders") // subcolección orders
+      .add({
+        clientTransactionId,
+        cart,
+        form,
+        metodo,
+        coords,
+        amount,
+        amountWithoutTax,
+        tax,
+        service,
+        tip,
+        status: "pending",
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    console.log(amount, "catida");
+    console.log(tax, "impuesto");
+    console.log(amountWithoutTax, "valor sin impuestos");
 
     res.json({
       clientTransactionId,
@@ -88,9 +92,8 @@ console.log(amountWithoutTax,"valor sin impuestos");
       storeId: STORE_ID,
       token: PAYPHONE_TOKEN,
       reference: `Pedido-${clientTransactionId}`,
-      orderId: docRef.id
+      orderId: docRef.id,
     });
-
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
@@ -103,67 +106,59 @@ console.log(amountWithoutTax,"valor sin impuestos");
 app.post("/confirm", async (req, res) => {
   try {
     const { id, clientTxId } = req.body;
-    if (!id || !clientTxId) return res.status(400).json({ error: "id y clientTxId requeridos" });
+    if (!id || !clientTxId)
+      return res.status(400).json({ error: "id y clientTxId requeridos" });
 
     const fetch = require("node-fetch");
-    const resp = await fetch("https://pay.payphonetodoesposible.com/api/button/V2/Confirm", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `bearer ${PAYPHONE_TOKEN}`
+    const resp = await fetch(
+      "https://pay.payphonetodoesposible.com/api/button/V2/Confirm",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `bearer ${PAYPHONE_TOKEN}`,
+        },
+        body: JSON.stringify({ id: Number(id), clientTxId }),
       },
-      body: JSON.stringify({ id: Number(id), clientTxId })
-    });
+    );
     const data = await resp.json();
 
     // Actualizar Firestore
-    const q = await db.collection("usuarios")                 // colección principal
-    .doc("principamorasadmi@moritas.com")  // documento específico del usuario
-    .collection("orders") 
-    .where("clientTransactionId","==",clientTxId).limit(1).get();
-    
+    const q = await db
+      .collection("usuarios") // colección principal
+      .doc("principamorasadmi@moritas.com") // documento específico del usuario
+      .collection("orders")
+      .where("clientTransactionId", "==", clientTxId)
+      .limit(1)
+      .get();
+
     let retiroCode = null;
-        let cart = null;
+    let cart = null;
 
     if (!q.empty) {
       const doc = q.docs[0];
 
-
-  // ✅ Solo si fue aprobado generamos código
+      // ✅ Solo si fue aprobado generamos código
       if (data?.transactionStatus === "Approved") {
         retiroCode = crypto.randomBytes(4).toString("hex").toUpperCase();
       }
-      
-      
-      
-      
-      
+
       await doc.ref.update({
-         ...(retiroCode && { retiroCode }), // 👈 guardamos el código en la orden
+        ...(retiroCode && { retiroCode }), // 👈 guardamos el código en la orden
         status: data?.transactionStatus || "unknown",
         payphoneResponse: data,
-        confirmedAt: admin.firestore.FieldValue.serverTimestamp()
+        confirmedAt: admin.firestore.FieldValue.serverTimestamp(),
       });
-   
-   
-    // Ahora leemos el carrito desde el doc
+
+      // Ahora leemos el carrito desde el doc
       const snapshot = await doc.ref.get();
       const orderData = snapshot.data();
       cart = orderData?.cart || null;
-   form = orderData?.form || null;
-    metodo = orderData?.metodo || null;
-
+      form = orderData?.form || null;
+      metodo = orderData?.metodo || null;
     }
 
-
-
-
-
-
-
-    
-    res.json({  data, retiroCode,cart ,form,metodo });
-
+    res.json({ data, retiroCode, cart, form, metodo });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });

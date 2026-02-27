@@ -3,23 +3,36 @@ import React, { useEffect, useState } from "react";
 
 import { collection, query, onSnapshot } from "firebase/firestore";
 import { db } from "../fitbase/Firebase";
+import { getDeviceId } from "../utilidades/deviceId";
 
 const Pedidos = () => {
   const [pedidos, setPedidos] = useState([]);
   const [selectedPedido, setSelectedPedido] = useState(null);
   const [toast, setToast] = useState(null); // <- estado para la notificación
   const userEmail = "principamorasadmi@moritas.com";
-useEffect(() => {
+
+const deviceId = getDeviceId();
+
+
+
+  useEffect(() => {
   const storedData = localStorage.getItem("paymentData");
   if (storedData) {
     try {
       const paymentData = JSON.parse(storedData);
-      // Filtramos solo Approved o entregado
       const filteredData = (Array.isArray(paymentData) ? paymentData : [paymentData])
-        .filter(
-          (pedido) =>
-            pedido.entregado || pedido?.payphoneResponse?.transactionStatus === "Approved"
+         .filter(
+    (pedido) =>
+      (pedido.entregado || pedido?.payphoneResponse?.transactionStatus === "Approved") &&
+      pedido?.form?.deviceId === deviceId // 🆕 solo los del mismo dispositivo
+  )
+        // 🟢 Ordenamos por fecha descendente (más reciente primero)
+        .sort(
+          (a, b) =>
+            new Date(b?.payphoneResponse?.date || 0) -
+            new Date(a?.payphoneResponse?.date || 0)
         );
+
       setPedidos(filteredData);
     } catch (error) {
       console.error("Error al parsear datos:", error);
@@ -27,19 +40,25 @@ useEffect(() => {
   }
 
   const q = query(collection(db, "usuarios", userEmail, "orders"));
-
   let prevPedidos = [];
 
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const updatedPedidos = snapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      // Filtramos aquí también
-      .filter(
-        (pedido) =>
-          pedido.entregado || pedido?.payphoneResponse?.transactionStatus === "Approved"
+   const updatedPedidos = snapshot.docs
+  .map((doc) => ({ id: doc.id, ...doc.data() }))
+  .filter(
+    (pedido) =>
+      (pedido.entregado || pedido?.payphoneResponse?.transactionStatus === "Approved") &&
+      pedido?.form?.deviceId === deviceId // 🆕 filtra por ID del dispositivo
+  )
+
+      // 🟢 Ordenamos también los datos en vivo
+      .sort(
+        (a, b) =>
+          new Date(b?.payphoneResponse?.date || 0) -
+          new Date(a?.payphoneResponse?.date || 0)
       );
 
-    // Detectar cambios de estado a "entregado"
+    // Detectar cambios de estado a entregado
     updatedPedidos.forEach((pedido) => {
       const oldPedido = prevPedidos.find((p) => p.id === pedido.id);
       if (oldPedido && !oldPedido.entregado && pedido.entregado) {
@@ -55,6 +74,17 @@ useEffect(() => {
 
   return () => unsubscribe();
 }, []);
+
+
+
+
+
+
+
+
+
+
+
 
 
 console.log(pedidos);
@@ -88,7 +118,7 @@ console.log(pedidos);
               </div>
 
               <div className="pedido-info">
-                <p className="igopditex"   ><strong>Pedido para:</strong> {pedido?.payphoneResponse?.optionalParameter4|| "N/A"}</p>
+                <p className="igopditex"   ><strong>Pedido para:</strong> {pedido?.form?.nombrecliente|| "N/A"}</p>
                          <p className="modal-contentp"   ><strong>Fecha:</strong> {new Date(pedido?.payphoneResponse?.date).toLocaleString()}</p>
 
               </div>

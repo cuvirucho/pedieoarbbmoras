@@ -3,130 +3,97 @@ import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../utilidades/Carousel";
 import { useNavigate } from "react-router-dom";
 
-const Menu = ({ onAdd, Menuac,setActiveView }) => {
+const Menu = ({ onAdd, Menuac, setActiveView }) => {
   const [busqueda, setBusqueda] = useState("");
   const [tipoSeleccionado, setTipoSeleccionado] = useState("todos");
   const [modalPlato, setModalPlato] = useState(null);
   const [selecciones, setSelecciones] = useState({});
   const [modalOriginPos, setModalOriginPos] = useState({ top: 0, left: 0 });
-const [toast, setToast] = useState({ visible: false, top: 0, left: 0 });
+  const [toast, setToast] = useState({ visible: false, top: 0, left: 0 });
 
   const platos = Object.entries(Menuac).map(([nombre, info]) => ({
     nombre,
-    ...info
+    ...info,
   }));
 
   const platosFiltrados = platos.filter((item) => {
     const nombreLower = item.nombre.toLowerCase();
     const busquedaLower = busqueda.toLowerCase();
     const coincideBusqueda = nombreLower.includes(busquedaLower);
-    const coincideTipo = tipoSeleccionado === "todos" || item.tipo === tipoSeleccionado;
+    const coincideTipo =
+      tipoSeleccionado === "todos" || item.tipo === tipoSeleccionado;
     return coincideBusqueda && coincideTipo;
   });
 
-  const tiposUnicos = ["todos", ...new Set(platos.map(p => p.tipo))];
-
+  const tiposUnicos = ["todos", ...new Set(platos.map((p) => p.tipo))];
 
   const handleSeleccion = (item, opcion) => {
-  setSelecciones((prev) => ({
-    ...prev,
-    [item]: opcion,
-  }));
-};
+    setSelecciones((prev) => ({
+      ...prev,
+      [item]: opcion,
+    }));
+  };
 
+  const handleAdd = (e) => {
+    if (modalPlato) {
+      const itemParaCarrito = {
+        id: crypto.randomUUID(),
+        nombre: modalPlato.nombre,
+        ingredientes: modalPlato.ingredientes,
+        precioVenta: modalPlato.precioVenta,
+        opciones: selecciones,
+      };
 
+      onAdd(itemParaCarrito);
+      setModalPlato(null);
+      setSelecciones({});
 
-const handleAdd = (e) => {
-  if (modalPlato) {
-    const itemParaCarrito = {
-      id: crypto.randomUUID(), 
-      nombre: modalPlato.nombre,
-      ingredientes: modalPlato.ingredientes,
-      precioVenta: modalPlato.precioVenta, 
-      opciones: selecciones,
-    };
+      // Obtener posición del click para el toast
+      const rect = e.currentTarget.getBoundingClientRect();
+      setToast({ visible: true, top: rect.top, left: rect.left });
 
-    onAdd(itemParaCarrito);
-    setModalPlato(null);
-    setSelecciones({});
+      setTimeout(() => setToast({ ...toast, visible: false }), 1500); // 1.5s
+      setActiveView("cart");
+    }
+  };
 
-    // Obtener posición del click para el toast
+  const openModal = (plato, e) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    setToast({ visible: true, top: rect.top, left: rect.left });
+    setModalOriginPos({ top: rect.top, left: rect.left });
 
-    setTimeout(() => setToast({ ...toast, visible: false }), 1500); // 1.5s
-  setActiveView("cart")
-  
-  }
-};
+    // Si tiene items, abrir modal normalmente
+    setModalPlato(plato);
+    setSelecciones({});
+  };
 
+  // 🔹 Diccionario global de preguntas/opciones (100% definido por ti)
+  const preguntasOpciones = {
+    huevos: {
+      pregunta: "¿Cómo quieres tus huevos?",
+      opciones: ["Revueltos", "Fritos", "Tibios"],
+    },
+    "bebida caliente": {
+      pregunta: "¿Qué tipo de bebida caliente prefieres?",
+      opciones: ["Cafe", "Café con leche", "Té"],
+    },
+    "bebida fría": {
+      pregunta: "¿Qué bebida fría prefieres?",
+      opciones: ["Jugo", "batido", "Agua"],
+    },
+    Pancakes: {
+      pregunta: "¿Prefieres Pancakes o Waffles?",
+      opciones: ["Pancakes", "Waffles"],
+    },
+  };
 
+  // 👉 arrastrar con el mouse SOLO en desktop
 
-
-const openModal = (plato, e) => {
-  const rect = e.currentTarget.getBoundingClientRect();
-  setModalOriginPos({ top: rect.top, left: rect.left });
-
-  // Si el plato no tiene items, se agrega directo al carrito
-  if (!plato.items || plato.items.length === 0) {
-    const itemParaCarrito = {
-     id: crypto.randomUUID(), 
-      nombre: plato.nombre,
-      ingredientes: plato.ingredientes,
-      precioVenta: plato.precioVenta,
-      opciones: {}, // no hay opciones
-    };
-
-    onAdd(itemParaCarrito);
-
-    // Mostrar toast en la misma posición
-    setToast({ visible: true, top: rect.top, left: rect.left });
-    setTimeout(() => setToast({ visible: false, top: 0, left: 0 }), 1500);
-    return;
-  }
-
-  // Si tiene items, abrir modal normalmente
-  setModalPlato(plato);
-  setSelecciones({});
-};
-
-
-
-
-// 🔹 Diccionario global de preguntas/opciones (100% definido por ti)
-const preguntasOpciones = {
-  "huevos": {
-    pregunta: "¿Cómo quieres tus huevos?",
-    opciones: ["Revueltos", "Fritos", "Tibios"],
-  },
-  "bebida caliente": {
-    pregunta: "¿Qué tipo de bebida caliente prefieres?",
-    opciones: ["Cafe", "Café con leche", "Té"],
-  },
-  "bebida fría": {
-    pregunta: "¿Qué bebida fría prefieres?",
-    opciones: ["Jugo", "batido", "Agua"],
-  },
-  Pancakes: {
-    pregunta: "¿Prefieres Pancakes o Waffles?",
-    opciones: ["Pancakes", "Waffles"],
-  },
-};
-
-
-
-
-// 👉 arrastrar con el mouse SOLO en desktop
-
-
-const scrollRef = useRef(null);
+  const scrollRef = useRef(null);
   const isDown = useRef(false);
   const startX = useRef(0);
-  const scrollLeft = useRef(0)
+  const scrollLeft = useRef(0);
 
-
-
-const handleMouseDown = (e) => {
+  const handleMouseDown = (e) => {
     if (window.innerWidth <= 468) return; // móvil usa scroll normal
     isDown.current = true;
     startX.current = e.pageX - scrollRef.current.offsetLeft;
@@ -149,30 +116,24 @@ const handleMouseDown = (e) => {
     scrollRef.current.scrollLeft = scrollLeft.current - walk;
   };
 
-///envia ajpmre 
-const navigate = useNavigate();
+  ///envia ajpmre
+  const navigate = useNavigate();
 
- const gopog = () => {
-  navigate("/pgos");
-};
-
-
-
-
-
+  const gopog = () => {
+    navigate("/pgos");
+  };
 
   return (
     <div className="menu">
-    
-    <section>
+      <section>
+        <img
+          className="imgbibe"
+          src="https://res.cloudinary.com/db8e98ggo/image/upload/v1757369169/hermano_Miguel_y_calle_larga_2_qlsdfs.png"
+          alt=""
+        />
+      </section>
 
-<img className="imgbibe" src="https://res.cloudinary.com/db8e98ggo/image/upload/v1757369169/hermano_Miguel_y_calle_larga_2_qlsdfs.png" alt="" />
-
-
-    </section>
-   
-<p  className="titulo"  >Nuesto menu</p>
-
+      <p className="titulo">Nuesto menu</p>
 
       <input
         type="text"
@@ -183,7 +144,7 @@ const navigate = useNavigate();
       />
 
       <div className="menu-tipos">
-        {tiposUnicos.map(tipo => (
+        {tiposUnicos.map((tipo) => (
           <button
             key={tipo}
             onClick={() => setTipoSeleccionado(tipo)}
@@ -194,14 +155,13 @@ const navigate = useNavigate();
         ))}
       </div>
 
-        <div
+      <div
         className="menuconte"
         ref={scrollRef}
         onMouseDown={handleMouseDown}
         onMouseLeave={handleMouseLeave}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-
       >
         {platosFiltrados.length > 0 ? (
           <AnimatePresence>
@@ -269,126 +229,78 @@ const navigate = useNavigate();
                 scale: 0.5,
                 x: modalOriginPos.left,
                 y: modalOriginPos.top,
-                opacity: 0
+                opacity: 0,
               }}
               animate={{ scale: 1, x: 0, y: 0, opacity: 1 }}
               exit={{ scale: 0.5, opacity: 0 }}
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
               onClick={(e) => e.stopPropagation()}
             >
-            
-            
-            
-            
-
-            
-            
               <h2 className="modal-titulo">{modalPlato.nombre}</h2>
-           
 
+              {modalPlato.items?.map((itemName) => {
+                const config = preguntasOpciones[itemName]; // buscamos configuración
+                if (!config) return null; // ⛔ si no existe, no se muestra nada
 
+                return (
+                  <div key={itemName} className="modal-item">
+                    <label>{config.pregunta}</label>
+                    <div className="opciones-botones">
+                      {config.opciones.map((opt) => (
+                        <motion.button
+                          key={opt}
+                          className={`opcion-btn ${selecciones[itemName] === opt ? "activo" : ""}`}
+                          onClick={() => handleSeleccion(itemName, opt)}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          {opt}
+                        </motion.button>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
 
-
-
-
-
-
-
-
-{modalPlato.items?.map((itemName) => {
-  const config = preguntasOpciones[itemName]; // buscamos configuración
-  if (!config) return null; // ⛔ si no existe, no se muestra nada
-
-  return (
-    <div key={itemName} className="modal-item">
-      <label>{config.pregunta}</label>
-      <div className="opciones-botones">
-        {config.opciones.map((opt) => (
-          <motion.button
-            key={opt}
-            className={`opcion-btn ${selecciones[itemName] === opt ? "activo" : ""}`}
-            onClick={() => handleSeleccion(itemName, opt)}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            {opt}
-          </motion.button>
-        ))}
-      </div>
-    </div>
-  );
-})}
-
-
-           
-           
-           
-           
-           
-           
-           
-           
-           
-           
-           
               <div className="modal-buttons">
-<motion.button
-  className="add-btn"
-  onClick={(e) => handleAdd(e)}
-  whileHover={{ scale: 1.05 }}
-  whileTap={{ scale: 0.95 }}
->
-  Añadir al carrito
-</motion.button>
-
-            
-            
+                <motion.button
+                  className="add-btn"
+                  onClick={(e) => handleAdd(e)}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Añadir al carrito
+                </motion.button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-   
-
-
-
-
-
-<AnimatePresence>
-  {toast.visible && (
-    <motion.div
-      className="toast-popup"
-      initial={{ opacity: 0, y: 400, scale: 0.8 }}
-      animate={{ opacity: 1, y: -10, scale: 1 }}
-      exit={{ opacity: 0, y: -30, scale: 0.8 }}
-      transition={{ duration: 0.5 }}
-      style={{
-        position: "fixed",
-        top: toast.top,
-        left: toast.left,
-        background: "blueviolet",
-        color: "#fff",
-        padding: "10px 20px",
-        borderRadius: "8px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-        zIndex: 9999,
-      }}
-    >
-      ¡Tu producto fue agregado!
-    </motion.div>
-  )}
-</AnimatePresence>
-
-
-
-
-
-
-
-
-
-
+      <AnimatePresence>
+        {toast.visible && (
+          <motion.div
+            className="toast-popup"
+            initial={{ opacity: 0, y: 400, scale: 0.8 }}
+            animate={{ opacity: 1, y: -10, scale: 1 }}
+            exit={{ opacity: 0, y: -30, scale: 0.8 }}
+            transition={{ duration: 0.5 }}
+            style={{
+              position: "fixed",
+              top: toast.top,
+              left: toast.left,
+              background: "blueviolet",
+              color: "#fff",
+              padding: "10px 20px",
+              borderRadius: "8px",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+              zIndex: 9999,
+            }}
+          >
+            ¡Tu producto fue agregado!
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
