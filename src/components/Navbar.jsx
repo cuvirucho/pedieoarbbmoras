@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Navbar = ({ activeView, setActiveView }) => {
+const Navbar = ({ activeView, setActiveView, cartCount = 0 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleNavClick = (view) => {
@@ -10,8 +10,9 @@ const Navbar = ({ activeView, setActiveView }) => {
 
   return (
     <>
-      {/* Fondo oscuro detrás del menú */}
-      {isOpen && <div className="overlay" onClick={() => setIsOpen(false)}></div>}
+      {isOpen && (
+        <div className="overlay" onClick={() => setIsOpen(false)}></div>
+      )}
 
       <nav className="navbar">
         <div className="navbar-container">
@@ -21,36 +22,43 @@ const Navbar = ({ activeView, setActiveView }) => {
             className="logo"
           />
 
-          {/* Botón hamburguesa */}
-          <button className="hamburger" onClick={() => setIsOpen(!isOpen)}>
-            ☰
+          <button
+            className="hamburger"
+            onClick={() => setIsOpen(!isOpen)}
+            aria-label="Abrir menú"
+            style={{ color: "white" }}
+          >
+            {isOpen ? "✕" : "☰"}
           </button>
 
-          {/* Enlaces del menú */}
           <div className={`nav-links ${isOpen ? "open" : ""}`}>
             <button
               className={activeView === "menu" ? "active" : ""}
               onClick={() => handleNavClick("menu")}
             >
-              Menu
+              🍽 Menú
             </button>
             <button
               className={activeView === "cart" ? "active" : ""}
               onClick={() => handleNavClick("cart")}
+              style={{ position: "relative" }}
             >
-              Carrito
+              🛒 Carrito
+              {cartCount > 0 && (
+                <span className="nav-cart-badge">{cartCount}</span>
+              )}
             </button>
             <button
               className={activeView === "Pedidos" ? "active" : ""}
               onClick={() => handleNavClick("Pedidos")}
             >
-              Pedidos
+              📦 Pedidos
             </button>
             <button
               className={activeView === "Lealtad" ? "active" : ""}
               onClick={() => handleNavClick("Lealtad")}
             >
-              Premios
+              🎁 Premios
             </button>
           </div>
         </div>

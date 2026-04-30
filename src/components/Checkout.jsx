@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Hotel, ShoppingCart, Store } from "lucide-react"; // íconos
 
-import UberEatsGooglePicker from "../utilidades/mapma";
+import MapaPicker from "../utilidades/mapma";
 import { getDeviceId } from "../utilidades/deviceId";
 
 const API = import.meta.env.VITE_API_URL || "";
@@ -254,9 +254,7 @@ const Checkout = ({ cart, setCart }) => {
                       </button>
                     </article>
                   ) : (
-                    <UberEatsGooglePicker
-                      onLocationSelect={handleLocationSelect}
-                    />
+                    <MapaPicker onLocationSelect={handleLocationSelect} />
                   )}
 
                   {metodo === "hospedaje" && errors.coords && (

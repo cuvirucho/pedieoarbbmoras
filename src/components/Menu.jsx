@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import Carousel from "../utilidades/Carousel";
 import { useNavigate } from "react-router-dom";
 
+const SkeletonCard = () => <div className="skeleton skeleton-card" />;
+
 const Menu = ({ onAdd, Menuac, setActiveView }) => {
   const [busqueda, setBusqueda] = useState("");
   const [tipoSeleccionado, setTipoSeleccionado] = useState("todos");
@@ -16,14 +18,24 @@ const Menu = ({ onAdd, Menuac, setActiveView }) => {
     ...info,
   }));
 
-  const platosFiltrados = platos.filter((item) => {
-    const nombreLower = item.nombre.toLowerCase();
-    const busquedaLower = busqueda.toLowerCase();
-    const coincideBusqueda = nombreLower.includes(busquedaLower);
-    const coincideTipo =
-      tipoSeleccionado === "todos" || item.tipo === tipoSeleccionado;
-    return coincideBusqueda && coincideTipo;
-  });
+  const isLoading = platos.length === 0;
+
+  const platosFiltrados = platos
+    .filter((item) => {
+      const nombreLower = item.nombre.toLowerCase();
+      const busquedaLower = busqueda.toLowerCase();
+      const coincideBusqueda = nombreLower.includes(busquedaLower);
+      const coincideTipo =
+        tipoSeleccionado === "todos" || item.tipo === tipoSeleccionado;
+      return coincideBusqueda && coincideTipo;
+    })
+    .sort((a, b) => {
+      const aHasFoto = a.IMAGENES && a.IMAGENES.length > 0;
+      const bHasFoto = b.IMAGENES && b.IMAGENES.length > 0;
+      if (aHasFoto && !bHasFoto) return -1;
+      if (!aHasFoto && bHasFoto) return 1;
+      return 0;
+    });
 
   const tiposUnicos = ["todos", ...new Set(platos.map((p) => p.tipo))];
 
@@ -125,7 +137,7 @@ const Menu = ({ onAdd, Menuac, setActiveView }) => {
 
   return (
     <div className="menu">
-      <section>
+      <section className="menuhero">
         <img
           className="imgbibe"
           src="https://res.cloudinary.com/db8e98ggo/image/upload/v1757369169/hermano_Miguel_y_calle_larga_2_qlsdfs.png"
@@ -133,7 +145,7 @@ const Menu = ({ onAdd, Menuac, setActiveView }) => {
         />
       </section>
 
-      <p className="titulo">Nuesto menu</p>
+      <p className="titulo">Nuestro menú</p>
 
       <input
         type="text"
@@ -163,51 +175,53 @@ const Menu = ({ onAdd, Menuac, setActiveView }) => {
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
       >
-        {platosFiltrados.length > 0 ? (
+        {isLoading ? (
+          [1, 2, 3, 4].map((n) => <SkeletonCard key={n} />)
+        ) : platosFiltrados.length > 0 ? (
           <AnimatePresence>
-            {platosFiltrados.map((plato, index) => (
-              <motion.div
-                key={plato.nombre}
-                className="menu-card"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                whileHover={{
-                  y: -5,
-                  boxShadow: "0 10px 20px rgba(103, 27, 224, 0.87)",
-                }}
-                style={{ minWidth: "250px", flexShrink: 0 }} // 👈 ancho fijo para que se vea en horizontal
-              >
-                {/* tu card tal cual */}
-                <div>
-                  <Carousel
-                    images={plato.IMAGENES || []}
-                    autoPlay
-                    interval={8000}
-                    showArrows
-                    showDots
-                    loop
-                    aspectRatio="0 / 0"
-                  />
-                </div>
-
-                <div className="dtospato1">
-                  <h3 className="nombre-plato">{plato.nombre}</h3>
-                  <p className="precio">{plato.precioVenta.toFixed(2)}</p>
-                </div>
-                <p className="decrolpt">{plato.descripcion}</p>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={(e) => openModal(plato, e)}
-                  className="menu-cardbutt"
+            {platosFiltrados.map((plato, index) => {
+              return (
+                <motion.div
+                  key={plato.nombre}
+                  className="menu-card"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
+                  whileHover={{
+                    y: -5,
+                    boxShadow: "0 10px 20px rgba(103, 27, 224, 0.87)",
+                  }}
                 >
-                  Seleccionar
-                </motion.button>
-              </motion.div>
-            ))}
+                  <div style={{ position: "relative" }}>
+                    <Carousel
+                      images={plato.IMAGENES || []}
+                      autoPlay
+                      interval={8000}
+                      showArrows
+                      showDots
+                      loop
+                      aspectRatio="0 / 0"
+                    />
+                  </div>
+
+                  <div className="dtospato1">
+                    <h3 className="nombre-plato">{plato.nombre}</h3>
+                    <p className="precio">${plato.precioVenta.toFixed(2)}</p>
+                  </div>
+                  <p className="decrolpt">{plato.descripcion}</p>
+
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => openModal(plato, e)}
+                    className="menu-cardbutt"
+                  >
+                    ver mas{" "}
+                  </motion.button>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         ) : (
           <p>No se encontraron platos</p>
@@ -236,41 +250,55 @@ const Menu = ({ onAdd, Menuac, setActiveView }) => {
               transition={{ type: "spring", stiffness: 100, damping: 15 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="modal-titulo">{modalPlato.nombre}</h2>
+              {modalPlato.IMAGENES?.[0] && (
+                <img
+                  src={modalPlato.IMAGENES[0]}
+                  alt={modalPlato.nombre}
+                  className="modal-hero"
+                />
+              )}
 
-              {modalPlato.items?.map((itemName) => {
-                const config = preguntasOpciones[itemName]; // buscamos configuración
-                if (!config) return null; // ⛔ si no existe, no se muestra nada
+              <div className="modal-body">
+                <h2 className="modal-titulo">{modalPlato.nombre}</h2>
 
-                return (
-                  <div key={itemName} className="modal-item">
-                    <label>{config.pregunta}</label>
-                    <div className="opciones-botones">
-                      {config.opciones.map((opt) => (
-                        <motion.button
-                          key={opt}
-                          className={`opcion-btn ${selecciones[itemName] === opt ? "activo" : ""}`}
-                          onClick={() => handleSeleccion(itemName, opt)}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          {opt}
-                        </motion.button>
-                      ))}
+                {modalPlato.descripcion && (
+                  <p className="modal-descripcion">{modalPlato.descripcion}</p>
+                )}
+
+                {modalPlato.items?.map((itemName) => {
+                  const config = preguntasOpciones[itemName];
+                  if (!config) return null;
+
+                  return (
+                    <div key={itemName} className="modal-item">
+                      <label>{config.pregunta}</label>
+                      <div className="opciones-botones">
+                        {config.opciones.map((opt) => (
+                          <motion.button
+                            key={opt}
+                            className={`opcion-btn ${selecciones[itemName] === opt ? "activo" : ""}`}
+                            onClick={() => handleSeleccion(itemName, opt)}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {opt}
+                          </motion.button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
 
-              <div className="modal-buttons">
-                <motion.button
-                  className="add-btn"
-                  onClick={(e) => handleAdd(e)}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Añadir al carrito
-                </motion.button>
+                <div className="modal-buttons">
+                  <motion.button
+                    className="add-btn"
+                    onClick={(e) => handleAdd(e)}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Añadir al carrito
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
